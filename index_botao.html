@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Botão</title>
+    <style>
+        div {
+            background-color: lightgrey;
+            width: 300px;
+            border: 15px solid #FF007F;
+            padding: 50px;
+            margin: 20px;
+        }
+
+        input[type=text] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            margin: 0 0 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .voz {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #999;
+        }
+
+        .relogio {
+            font-size: 14px;
+            margin-left: 10px;
+            color: #555;
+        }
+
+        @keyframes neonPiscante {
+            0% {
+                border-color: #FF007F;
+            }
+
+            50% {
+                border-color: #FFCBDB;
+            }
+
+            100% {
+                border-color: #FF007F;
+            }
+        }
+
+        .borda-neon {
+            border: 15px solid #FF007F;
+            border-radius: 5px;
+            animation: neonPiscante 1s infinite;
+        }
+
+        .btn {
+            background-color: #FF007F;
+            color: white;
+            cursor: pointer;
+        }
+
+        .rmds
+        {
+          position: absolute;
+          top: 60px;
+          left: 640px;
+        }
+
+        .circle {
+            height: 50px;
+            width: 50px;
+            background-color: #ccc;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+
+    <body>
+      <center>
+       <a href="./index.html"> <div class="circle">
+          <img class="rmds" src="img/remedio.png"height="100px" width="100px" alt="">
+        </div></a>
+      </center>
+      
+    </body>
+
+    <script>
+        function adicionar() {
+            const item = document.createElement("li");
+
+            const nome = document.getElementById("nome").value;
+            const lista = document.getElementById("lista").value;
+
+            const horaInput = document.getElementById("hora").value;
+            const hora = horaInput ? horaInput : new Date().toLocaleTimeString();
+
+            const segundos = new Date().getSeconds();
+            const horaComSegundos = `${hora}`;
+
+            item.innerHTML = `${nome} - ${lista} - Hora: ${horaComSegundos}`;
+
+            const listaAnotacoes = document.getElementById("anotacoes");
+            listaAnotacoes.appendChild(item);
+
+            setTimeout(() => {
+                speakText(`${nome} Tomar Remédio: ${lista} Agora são: ${horaComSegundos}`);
+            }, 59000); // Atraso de 2 segundos
+        }
+
+        function speakText(text) {
+            var utterance = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(utterance);
+        }
+
+        const recognition = new (webkitSpeechRecognition || SpeechRecognition)();
+        recognition.lang = 'pt-BR';
+
+        recognition.onresult = function (event) {
+            const result = event.results[0][0].transcript.toLowerCase();
+            console.log(result);
+            if (result.includes("tomar remédio")) {
+                adicionar();
+            }
+        };
+
+        document.querySelector('button').addEventListener('click', function () {
+            recognition.start();
+        });
+
+        function limparLista() {
+            const listaAnotacoes = document.getElementById("anotacoes");
+            listaAnotacoes.innerHTML = "";
+        }
+
+        // Adiciona o relógio
+        function atualizarRelogio() {
+            const relogioElement = document.getElementById('relogio');
+            const agora = new Date();
+            const horas = agora.getHours().toString().padStart(2, '0');
+            const minutos = agora.getMinutes().toString().padStart(2, '0');
+            const segundos = agora.getSeconds().toString().padStart(2, '0');
+            relogioElement.textContent = `${horas}:${minutos}:${segundos}`;
+            setTimeout(atualizarRelogio, 1000); // Atualiza a cada segundo
+        }
+
+        // Inicia o relógio quando a página carrega
+        document.addEventListener('DOMContentLoaded', function () {
+            atualizarRelogio();
+        });
+    </script>
+
+</html>
